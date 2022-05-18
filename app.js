@@ -15,8 +15,14 @@ async function formSubmitted(e) {
     console.log('form submitted');
     const searchTerm = input.value;
     console.log(searchTerm);
-    const results = await getResults(searchTerm)
+    try {
+      const results = await getResults(searchTerm)
     showResults(results);
+      
+    } catch (error) {
+      showError(error)
+    }
+    
 }
 
 async function getResults(searchTerm) {
@@ -24,6 +30,9 @@ async function getResults(searchTerm) {
     console.log(url)
     const response = await fetch(url);
     const data = await response.json();
+    if(data.Error){
+      throw new Error(data.Error);
+    }
     console.log(data);
     const results = data.Search;
     return results;
@@ -38,6 +47,8 @@ function showResults(results) {
           <div class="card-body">
             <h5 class="card-title">${movie.Title}</h5>
             <p class="card-text">${movie.Year}</p>
+            <button type="submit" class="btn btn-danger">Watch Later</button>
+
           </div>
         </div>`
             return html;
@@ -49,6 +60,8 @@ function showResults(results) {
         <div class="card-body">
           <h5 class="card-title">${movie.Title}</h5>
           <p class="card-text">${movie.Year}</p>
+          <button data-id="${movie.imdbID}"  type="submit" class="btn btn-danger watch-later-button">Watch Later</button>
+
         </div>
       </div>`
         }
@@ -56,7 +69,18 @@ function showResults(results) {
 
     }, '');
 
+    const watchLaterButtons = document.querySelectorAll('.watch-later-button');
+    watchLaterButtons.forEach(button =>{
+      button.addEventListener('click', (e) =>{
+        //destructor, grab the id value of the dataset and set it equal to id
+        const { id } = button.dataset;
+          const movie = results.find(movie => movie.imdbID === id )
+          console.log(movie);
+      })
+    })
 
-
-
-}
+   
+  }
+  function showError(error){
+    resultsSection.innerHTML = `<div class="alert alert-danger col" role="alert">${error.message}</div>`
+  }
