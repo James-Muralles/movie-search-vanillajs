@@ -1,4 +1,5 @@
 console.log("Hello World");
+console.log('Jimmy')
 
 const form = document.querySelector("form");
 const input = document.querySelector("#searchTerm");
