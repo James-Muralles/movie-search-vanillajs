@@ -5,6 +5,7 @@ const form = document.querySelector("form");
 const input = document.querySelector("#searchTerm");
 const API_URL = 'http://www.omdbapi.com/?apikey=218ed628&s='
 const resultsSection = document.querySelector("#results");
+const watchLaterSection = document.querySelector("#watch-later");
 
 
 
@@ -41,43 +42,57 @@ async function getResults(searchTerm) {
 
 function showResults(results) {
     resultsSection.innerHTML = results.reduce((html, movie) => {
-        if (movie.Poster === 'N/A') {
-            html += `<div class="card col-4">
-          <img src="https://media.gettyimages.com/photos/americanbritish-actress-gillian-anderson-wearing-a-black-trouser-suit-picture-id1249788900?s=612x612" class="card-img-top" alt="${movie.title} width="81.33" height="123.61"">
-          <div class="card-body">
-            <h5 class="card-title">${movie.Title}</h5>
-            <p class="card-text">${movie.Year}</p>
-            <button type="submit" class="btn btn-danger">Watch Later</button>
-
-          </div>
-        </div>`
-            return html;
-
-
-        } else {
-            html += `<div class="card col-4">
-        <img src="${movie.Poster} " class="card-img-top" alt="${movie.title}">
-        <div class="card-body">
-          <h5 class="card-title">${movie.Title}</h5>
-          <p class="card-text">${movie.Year}</p>
-          <button data-id="${movie.imdbID}"  type="submit" class="btn btn-danger watch-later-button">Watch Later</button>
-
-        </div>
-      </div>`
-        }
-        return html;
+           
+          return html + getMovieTemplate(movie, 4);
+        
 
     }, '');
 
     const watchLaterButtons = document.querySelectorAll('.watch-later-button');
     watchLaterButtons.forEach(button =>{
       button.addEventListener('click', (e) =>{
-        //destructor, grab the id value of the dataset and set it equal to id
+        //destructure, grab the id value of the dataset and set it equal to id
         const { id } = button.dataset;
-          const movie = results.find(movie => movie.imdbID === id )
+          const movie = results.find(movie => movie.imdbID === id );
+          watchLaterSection.innerHTML = watchLaterSection.innerHTML + getMovieTemplate(movie, 12, false)
           console.log(movie);
       })
     })
+
+    function getMovieTemplate(movie, cols, button = true){
+
+      if(movie.Poster === 'N/A') {
+        return `<div class="card col-${cols}">
+      <img src="https://media.gettyimages.com/photos/americanbritish-actress-gillian-anderson-wearing-a-black-trouser-suit-picture-id1249788900?s=612x612" class="card-img-top" alt="${movie.title} width="81.33" height="123.61"">
+      <div class="card-body">
+        <h5 class="card-title">${movie.Title}</h5>
+        <p class="card-text">${movie.Year}</p>
+        ${button ? `<button data-id="${movie.imdbID}"  type="submit" class="btn btn-danger watch-later-button">Watch Later</button>`: ''}
+
+      </div>
+    </div>`
+
+
+    } else {
+        
+      return `
+      <div class="card col-${cols}">
+      <img src="${movie.Poster} " class="card-img-top" alt="${movie.title}">
+      <div class="card-body">
+        <h5 class="card-title">${movie.Title}</h5>
+        <p class="card-text">${movie.Year}</p>
+        ${button ? `<button data-id="${movie.imdbID}"  type="submit" class="btn btn-danger watch-later-button">Watch Later</button>`: ''}
+
+      </div>
+    </div>`;
+    }
+
+
+
+
+      
+    }
+
 
    
   }
