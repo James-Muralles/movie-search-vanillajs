@@ -10,13 +10,13 @@ const resultsSection = document.querySelector("#results");
 
 form.addEventListener('submit', formSubmitted);
 
-function formSubmitted(e) {
+async function formSubmitted(e) {
     e.preventDefault();
     console.log('form submitted');
     const searchTerm = input.value;
     console.log(searchTerm);
-    getResults(searchTerm)
-        .then(showResults)
+    const results = await getResults(searchTerm)
+    showResults(results);
 }
 
 async function getResults(searchTerm) {
