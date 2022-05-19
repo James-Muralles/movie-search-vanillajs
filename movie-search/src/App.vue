@@ -26,42 +26,22 @@
                 <section class="row movies-area">
                     <section class="mt-2 col-9 row" id="results">
                         <div v-if="error" class="alert alert-danger col" role="alert">{{ error }}</div>
-                        <div class="card col-4" v-for="movie in results" :key="movie.ID">
-                            <template v-if="movie.Poster != 'N/A'">
-                                <img :src="movie.Poster" class="card-img-top" :alt="movie.Title">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ movie.Title }}</h5>
-                                    <p class="card-text">{{ movie.Year }}</p>
-                                    <button @click="addToWatchLater(movie)" type="submit" class="btn btn-danger">Watch
-                                        Later</button>
-                                </div>
-                            </template>
-                            <template v-else-if="movie.Poster = 'N/A'">
-                                <img src="https://media.gettyimages.com/photos/americanbritish-actress-gillian-anderson-wearing-a-black-trouser-suit-picture-id1249788900?s=612x612"
-                                    class="card-img-top" :alt="
-                                    movie.title" width="81.33" height="123.61">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ movie.Title }}</h5>
-                                    <p class="card-text">{{ movie.Year }}</p>
-                                    <button @click="addToWatchLater(movie)" type="submit" class="btn btn-danger">Watch
-                                        Later</button>
-                                </div>
-                            </template>
-
-                        </div>
+                        <MovieCom v-for="movie in results" :movie="movie" :key="movie.imdbID"
+                            :addToWatchLater="addToWatchLater"
+                            :isInWatchLater="isInWatchLater">
+                        </MovieCom>
 
                     </section>
                     <section class="mt-2 col-3 row">
                         <h3>Watch Later</h3>
                         <section class="row" id="watch-later">
-                            <div class="card col-12" v-for="movie in watchLater" :key="movie.ID">
-                                <img :src="movie.Poster" class="card-img-top" :alt="movie.Title">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ movie.Title }}</h5>
-                                    <p class="card-text">{{ movie.Year }}</p>
-
-                                </div>
-                            </div>
+                            <MovieCom 
+                            class="col-12" 
+                            :key="movie.imdbID"
+                            v-for="movie in watchLater" 
+                            :removeWatchLater="removeWatchLater"
+                            :movie="movie">
+                            </MovieCom>
 
 
                         </section>
@@ -77,6 +57,8 @@
 
 <script>
 
+import MovieCom from '@/components/MovieCom';
+
 const API_URL = 'http://www.omdbapi.com/?apikey=218ed628&s='
 
 export default {
@@ -86,7 +68,14 @@ export default {
         results: [],
         watchLater: [],
         error: '',
+
+
     }),
+
+
+    components: {
+        MovieCom,
+    },
 
     methods: {
         async getResults() {
@@ -99,9 +88,8 @@ export default {
 
             } else {
                 this.results = data.SearchedResults;
-                this.error = '',
-
-                    this.results = data.Search;
+                this.error = '';
+                this.results = data.Search;
 
             }
         },
@@ -109,8 +97,17 @@ export default {
         addToWatchLater(movie) {
             this.watchLater.push(movie);
 
-        }
+        },
+
+        isInWatchLater(movie){
+            return this.watchLater.some(wl => wl.imdbID === movie.imdbID)
+        },
+
+    removeWatchLater(movie){
+        const index = this.watchLater.indexOf(movie)
+        this.watchLater.splice(index, 1)
     }
+    },
 
 };
 </script>
